@@ -50,9 +50,14 @@ app.use((error, req, res, next) => {
     res.status(status).json({ message: message, data: data });
 });
 
-mongoose.connect('mongodb+srv://msnproduction:SZ1CMiHZyt8h1dcl@cluster0.nhyoubx.mongodb.net/blog?retryWrites=true&w=majority')
-    .then(() => {
-        app.listen(4000, () => console.log('Connection Success'));
+// Allow overriding the MongoDB connection string using an environment variable.
+// If MONGO_URI is not set, fall back to the existing Atlas connection string.
+const MONGO_URI = process.env.MONGO_URI ||
+    'mongodb+srv://msnproduction:SZ1CMiHZyt8h1dcl@cluster0.nhyoubx.mongodb.net/blog?retryWrites=true&w=majority';
 
+mongoose.connect(MONGO_URI)
+    .then(() => {
+        const port = process.env.PORT || 4000;
+        app.listen(port, () => console.log(`Connection Success - listening on ${port}`));
     })
     .catch(err => console.log(err));

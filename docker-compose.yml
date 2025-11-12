@@ -1,0 +1,37 @@
+version: "3.8"
+
+services:
+  api:
+    build: ./mern-api
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=production
+      - MONGO_URI=mongodb://mongo:27017/blog
+    restart: unless-stopped
+    volumes:
+      - ./mern-api/images:/app/images
+    depends_on:
+      - mongo
+
+  web:
+    build: ./mern-blog
+    ports:
+      - "3000:80" # maps host 3000 to nginx:80
+    restart: unless-stopped
+    depends_on:
+      - api
+
+  mongo:
+    image: mongo:6.0
+    restart: unless-stopped
+    volumes:
+      - mongo_data:/data/db
+    # optional: expose port to host for direct access (not required for compose networking)
+    # ports:
+    #   - "27017:27017"
+
+volumes:
+  mongo_data:
+
+# Use an external network or add services if needed.
